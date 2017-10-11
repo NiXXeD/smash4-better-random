@@ -1,8 +1,8 @@
 import React from 'react'
-import CharacterList from './CharacterList'
-import characters from './characters'
+    import CharacterList from './CharacterList'
+    import characters from './characters'
 
-class App extends React.Component {
+    class App extends React.Component {
     defaultState = {
         selected: [
             ...characters
@@ -40,16 +40,17 @@ class App extends React.Component {
                 [from]: oldState[from].filter(c => c.id !== character.id),
                 [to]: [...oldState[to], character]
             }
-
-            //save to local storage
-            let storageData = {
-                selected: newState.selected.map(c => c.id),
-                unselected: newState.unselected.map(c => c.id)
-            }
-            localStorage.setItem('characters', JSON.stringify(storageData))
-
+            this.saveToStorage(newState)
             return newState
         })
+    }
+    
+    saveToStorage(state) {
+        let storageData = {
+            selected: state.selected.map(c => c.id),
+            unselected: state.unselected.map(c => c.id)
+        }
+        localStorage.setItem('characters', JSON.stringify(storageData))
     }
 
     handleGo = () => {
@@ -65,6 +66,7 @@ class App extends React.Component {
 
     handleReset = () => {
         this.setState({...this.defaultState})
+        localStorage.removeItem('characters')
     }
 
     render() {
