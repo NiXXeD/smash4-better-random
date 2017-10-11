@@ -1,7 +1,6 @@
 import React from 'react'
 import CharacterList from './CharacterList'
 import characters from './characters'
-import Character from './Character'
 
 class App extends React.Component {
     defaultState = {
@@ -10,15 +9,47 @@ class App extends React.Component {
         ],
         unselected: []
     }
-    state = {...this.defaultState}
+    state = {
+        selected: [],
+        unselected: [],
+        chosen: null
+    }
+
+    componentDidMount() {
+        try {
+            let oldStorageData = localStorage.getItem('characters')
+            let savedState = JSON.parse(oldStorageData)
+            if (savedState.selected && savedState.unselected) {
+                let initialState = {
+                    selected: savedState.selected.map(id => characters.find(c => c.id === id)),
+                    unselected: savedState.unselected.map(id => characters.find(c => c.id === id))
+                }
+                return this.setState(initialState)
+            }
+        } catch (ex) {
+            console.log('Error loading local storage data: ', ex)
+        }
+        this.setState({...this.defaultState})
+    }
 
     handleCharacterChange = prev => (event, character) => {
         let from = prev ? 'selected' : 'unselected'
         let to = prev ? 'unselected' : 'selected'
-        this.setState(oldState => ({
-            [from]: oldState[from].filter(c => c.id !== character.id),
-            [to]: [...oldState[to], character]
-        }))
+        this.setState(oldState => {
+            let newState = {
+                [from]: oldState[from].filter(c => c.id !== character.id),
+                [to]: [...oldState[to], character]
+            }
+
+            //save to local storage
+            let storageData = {
+                selected: newState.selected.map(c => c.id),
+                unselected: newState.unselected.map(c => c.id)
+            }
+            localStorage.setItem('characters', JSON.stringify(storageData))
+
+            return newState
+        })
     }
 
     handleGo = () => {
