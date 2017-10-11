@@ -7,7 +7,7 @@ class CharacterList extends React.Component {
         const {characters, onClick, type} = this.props
 
         return (
-            <Masonry style={styles.masonry}>
+            <Masonry>
                 {
                     characters.map((data, key) =>
                         <Character
@@ -20,12 +20,6 @@ class CharacterList extends React.Component {
                 }
             </Masonry>
         )
-    }
-}
-
-const styles = {
-    masonry: {
-        maxWidth: 500
     }
 }
 

@@ -19,7 +19,7 @@ class Character extends React.Component {
                 title={data.name}
                 onClick={this.handleClick}
             >
-                {data.name}
+                <img alt={data.name} src={data.img}/>
             </div>
         )
     }
@@ -28,20 +28,20 @@ class Character extends React.Component {
 const styles = {
     character: {
         margin: 2,
-        width: 75,
-        height: 75,
+        width: 100,
+        height: 100,
         color: 'white',
         cursor: 'pointer',
         userSelect: 'none'
     },
     selected: {
-        border: '1px solid green'
+        border: '3px solid green'
     },
     unselected: {
-        border: '1px solid red'
+        border: '3px solid red'
     },
     chosen: {
-        border: '2px solid blue'
+        border: '5px solid blue'
     }
 }
 

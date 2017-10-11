@@ -1,8 +1,8 @@
 import React from 'react'
-    import CharacterList from './CharacterList'
-    import characters from './characters'
+import CharacterList from './CharacterList'
+import characters from './characters'
 
-    class App extends React.Component {
+class App extends React.Component {
     defaultState = {
         selected: [
             ...characters
@@ -17,7 +17,7 @@ import React from 'react'
 
     componentDidMount() {
         try {
-            let oldStorageData = localStorage.getItem('characters')
+            let oldStorageData = localStorage.getItem('characters') || '{}'
             let savedState = JSON.parse(oldStorageData)
             if (savedState.selected && savedState.unselected) {
                 let initialState = {
@@ -28,6 +28,7 @@ import React from 'react'
             }
         } catch (ex) {
             console.log('Error loading local storage data: ', ex)
+            localStorage.removeItem(localStorageKey)
         }
         this.setState({...this.defaultState})
     }
@@ -44,13 +45,13 @@ import React from 'react'
             return newState
         })
     }
-    
+
     saveToStorage(state) {
         let storageData = {
             selected: state.selected.map(c => c.id),
             unselected: state.unselected.map(c => c.id)
         }
-        localStorage.setItem('characters', JSON.stringify(storageData))
+        localStorage.setItem(localStorageKey, JSON.stringify(storageData))
     }
 
     handleGo = () => {
@@ -66,7 +67,7 @@ import React from 'react'
 
     handleReset = () => {
         this.setState({...this.defaultState})
-        localStorage.removeItem('characters')
+        localStorage.removeItem(localStorageKey)
     }
 
     render() {
@@ -97,5 +98,7 @@ import React from 'react'
         )
     }
 }
+
+const localStorageKey = 'characters'
 
 export default App
