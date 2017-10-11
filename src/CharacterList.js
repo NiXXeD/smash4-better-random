@@ -4,7 +4,7 @@ import Masonry from 'react-masonry-component'
 
 class CharacterList extends React.Component {
     render() {
-        const {characters, onClick, selected} = this.props
+        const {characters, onClick, type} = this.props
 
         return (
             <Masonry style={styles.masonry}>
@@ -14,7 +14,7 @@ class CharacterList extends React.Component {
                             key={key}
                             data={data}
                             onClick={onClick}
-                            selected={selected}
+                            type={type}
                         />
                     )
                 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import CharacterList from './CharacterList'
 import characters from './characters'
-import Randomizer from './Randomizer'
+import Character from './Character'
 
 class App extends React.Component {
     defaultState = {
@@ -12,7 +12,7 @@ class App extends React.Component {
     }
     state = {...this.defaultState}
 
-    handleClick = prev => (event, character) => {
+    handleCharacterChange = prev => (event, character) => {
         let from = prev ? 'selected' : 'unselected'
         let to = prev ? 'unselected' : 'selected'
         this.setState(oldState => ({
@@ -21,27 +21,44 @@ class App extends React.Component {
         }))
     }
 
+    handleGo = () => {
+        const {selected} = this.state
+        const count = selected.length
+        const result = Math.floor(Math.random() * count)
+        this.setState({chosen: selected[result]})
+    }
+
+    handleClear = () => {
+        this.setState({chosen: null})
+    }
+
     handleReset = () => {
         this.setState({...this.defaultState})
     }
 
     render() {
-        const {selected, unselected} = this.state
+        const {chosen, selected, unselected} = this.state
 
         return (
             <div>
                 <CharacterList
                     characters={selected}
-                    onClick={this.handleClick(true)}
-                    selected={true}
+                    onClick={this.handleCharacterChange(true)}
+                    type='selected'
                 />
                 <CharacterList
                     characters={unselected}
-                    onClick={this.handleClick(false)}
+                    onClick={this.handleCharacterChange(false)}
+                    type='unselected'
                 />
-                <Randomizer
-                    characters={selected}
-                    onReset={this.handleReset}
+
+                <button onClick={this.handleGo}>Go!</button>
+                <button onClick={this.handleClear}>Clear</button>
+                <button onClick={this.handleReset}>Reset</button>
+
+                <CharacterList
+                    characters={(chosen && [chosen]) || []}
+                    type='chosen'
                 />
             </div>
         )

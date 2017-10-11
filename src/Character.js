@@ -6,11 +6,11 @@ class Character extends React.Component {
     }
 
     render() {
-        const {data, selected} = this.props
+        const {data, type} = this.props
 
         const style = {
             ...styles.character,
-            ...!selected ? styles.disabled : styles.enabled
+            ...styles[type]
         }
 
         return (
@@ -34,11 +34,14 @@ const styles = {
         cursor: 'pointer',
         userSelect: 'none'
     },
-    enabled: {
+    selected: {
         border: '1px solid green'
     },
-    disabled: {
+    unselected: {
         border: '1px solid red'
+    },
+    chosen: {
+        border: '2px solid blue'
     }
 }
 
