@@ -177,7 +177,7 @@ const localStorageKey = 'characters'
 const styles = theme => ({
     card: {
         margin: 16,
-        minWidth: 448
+        minWidth: 345
     },
     divider: {
         marginTop: 8,
