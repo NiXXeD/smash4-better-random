@@ -1,8 +1,15 @@
 {
   "name": "smash4-better-random",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "homepage": "https://nixxed.github.io/smash4-better-random",
+  "author": "Andy Christianson",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NiXXeD/smash4-better-random"
+  },
   "dependencies": {
+    "gh-pages": "^1.0.0",
     "material-ui": "^1.0.0-beta.16",
     "material-ui-icons": "^1.0.0-beta.15",
     "react": "^16.0.0",
@@ -11,6 +18,8 @@
     "react-scripts": "1.0.14"
   },
   "scripts": {
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
