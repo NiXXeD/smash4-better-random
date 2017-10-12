@@ -12,7 +12,8 @@ class App extends React.Component {
     state = {
         selected: [],
         unselected: [],
-        chosen: null
+        chosen: null,
+        hide: true
     }
 
     componentDidMount() {
@@ -46,6 +47,17 @@ class App extends React.Component {
         })
     }
 
+    handleInverse = () => {
+        this.setState(oldState => {
+            let newState = {
+                selected: [...oldState.unselected],
+                unselected: [...oldState.selected]
+            }
+            this.saveToStorage(newState)
+            return newState
+        })
+    }
+
     saveToStorage(state) {
         let storageData = {
             selected: state.selected.map(c => c.id),
@@ -70,8 +82,16 @@ class App extends React.Component {
         localStorage.removeItem(localStorageKey)
     }
 
+    hideUnselected = () => {
+        this.setState({hide: true})
+    }
+
+    showUnselected = () => {
+        this.setState({hide: false})
+    }
+
     render() {
-        const {chosen, selected, unselected} = this.state
+        const {chosen, hide, selected, unselected} = this.state
 
         return (
             <div>
@@ -80,15 +100,21 @@ class App extends React.Component {
                     onClick={this.handleCharacterChange(true)}
                     type='selected'
                 />
-                <CharacterList
-                    characters={unselected}
-                    onClick={this.handleCharacterChange(false)}
-                    type='unselected'
-                />
+                {
+                    !hide &&
+                    <CharacterList
+                        characters={unselected}
+                        onClick={this.handleCharacterChange(false)}
+                        type='unselected'
+                    />
+                }
 
                 <button onClick={this.handleGo}>Go!</button>
                 <button onClick={this.handleClear}>Clear</button>
                 <button onClick={this.handleReset}>Reset</button>
+                <button onClick={this.handleInverse}>Inverse</button>
+                {!hide && <button onClick={this.hideUnselected}>Hide Unselected</button>}
+                {hide && <button onClick={this.showUnselected}>Show Unselected</button>}
 
                 <CharacterList
                     characters={(chosen && [chosen]) || []}

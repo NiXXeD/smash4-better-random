@@ -34,14 +34,8 @@ const styles = {
         cursor: 'pointer',
         userSelect: 'none'
     },
-    selected: {
-        border: '3px solid green'
-    },
     unselected: {
-        border: '3px solid red'
-    },
-    chosen: {
-        border: '5px solid blue'
+        filter: 'grayscale(100%)'
     }
 }
 
