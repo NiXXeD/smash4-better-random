@@ -5,6 +5,9 @@ Smash 4 has a "random" character select feature, but no way of removing
 certain characters from use. This tool helps with that by letting you 
 decide which characters are included in the random select.
 
+#### Example Site
+https://nixxed.github.io/smash4-better-random
+
 #### How to run
 ```
 yarn start
