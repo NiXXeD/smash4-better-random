@@ -1,31 +1,23 @@
 import React from 'react'
 import CharacterList from './CharacterList'
 import characters from './characters'
-import IconButton from 'material-ui/IconButton'
-import Divider from 'material-ui/Divider'
+import Button from 'material-ui/Button'
 import Card, {CardActions, CardContent, CardHeader} from 'material-ui/Card'
 import {withStyles} from 'material-ui/styles'
-import Typography from 'material-ui/Typography'
-import ReplayIcon from 'material-ui-icons/Replay'
-import VisibilityIcon from 'material-ui-icons/Visibility'
-import VisibilityOffIcon from 'material-ui-icons/VisibilityOff'
-import ClearIcon from 'material-ui-icons/Clear'
-import SelectAllIcon from 'material-ui-icons/SelectAll'
-import Tooltip from 'material-ui/Tooltip'
+import Character from './Character'
 
 class Randomizer extends React.Component {
     defaultState = {
-        selected: [
+        available: [
             ...characters
         ],
-        unselected: []
+        unavailable: []
     }
 
     state = {
-        selected: [],
-        unselected: [],
-        chosen: {},
-        hide: true
+        available: [],
+        unavailable: [],
+        chosen: {}
     }
 
     componentDidMount() {
@@ -34,23 +26,25 @@ class Randomizer extends React.Component {
     }
 
     handleCharacterChange = prev => (event, character) => {
-        let from = prev ? 'selected' : 'unselected'
-        let to = prev ? 'unselected' : 'selected'
-        this.setState(oldState => {
-            let newState = {
-                [from]: oldState[from].filter(c => c.id !== character.id),
-                [to]: [...oldState[to], character]
-            }
-            this.saveToStorage(newState)
-            return newState
-        })
+        let from = prev ? 'available' : 'unavailable'
+        let to = prev ? 'unavailable' : 'available'
+        if (character) {
+            this.setState(oldState => {
+                let newState = {
+                    [from]: oldState[from].filter(c => c.id !== character.id),
+                    [to]: [...oldState[to], character]
+                }
+                this.saveToStorage(newState)
+                return newState
+            })
+        }
     }
 
     handleInverse = () => {
         this.setState(oldState => {
             let newState = {
-                selected: [...oldState.unselected],
-                unselected: [...oldState.selected]
+                available: [...oldState.unavailable],
+                unavailable: [...oldState.available]
             }
             this.saveToStorage(newState)
             return newState
@@ -58,24 +52,19 @@ class Randomizer extends React.Component {
     }
 
     saveToStorage(state) {
-        let storageData = {
-            selected: state.selected.map(c => c.id),
-            unselected: state.unselected.map(c => c.id)
-        }
+        let storageData = state.unavailable.map(c => c.id)
         localStorage.setItem(localStorageKey, JSON.stringify(storageData))
     }
 
     loadFromStorage() {
         try {
-            let oldStorageData = localStorage.getItem('characters') || '{}'
+            let oldStorageData = localStorage.getItem('characters') || '[]'
             let savedState = JSON.parse(oldStorageData)
-            if (savedState.selected && savedState.unselected) {
-                let initialState = {
-                    selected: savedState.selected.map(id => characters.find(c => c.id === id)),
-                    unselected: savedState.unselected.map(id => characters.find(c => c.id === id))
-                }
-                return this.setState(initialState)
+            let initialState = {
+                available: characters.filter(c => !savedState.includes(c.id)),
+                unavailable: savedState.map(id => characters.find(c => c.id === id))
             }
+            return this.setState(initialState)
         } catch (ex) {
             console.log('Error loading local storage data: ', ex)
             localStorage.removeItem(localStorageKey)
@@ -84,10 +73,10 @@ class Randomizer extends React.Component {
     }
 
     handleRandomize = () => {
-        const {selected} = this.state
-        const count = selected.length
+        const {available} = this.state
+        const count = available.length
         const result = Math.floor(Math.random() * count)
-        this.setState({chosen: selected[result]})
+        this.setState({chosen: available[result]})
     }
 
     handleReset = () => {
@@ -95,79 +84,56 @@ class Randomizer extends React.Component {
         localStorage.removeItem(localStorageKey)
     }
 
-    handleVisibilityChange = hide => () => {
-        this.setState({hide})
-    }
-
     render() {
-        const {chosen, hide, selected, unselected} = this.state
+        const {chosen, available, unavailable} = this.state
         const {classes} = this.props
 
         return (
-            <Card className={classes.card}>
-                <CardHeader title="Random Character Select"/>
-                <CardContent>
-                    <Typography type="subheading">Selected</Typography>
-                    <CharacterList
-                        characters={selected}
-                        onClick={this.handleCharacterChange(true)}
-                        type='selected'
-                    />
+            <div className={classes.container}>
+                {/* Chosen Character */}
+                <Card className={classes.chosenCard}>
+                    <CardHeader title="Random Character Select"/>
+                    <CardContent>
+                        <Character data={chosen} type="chosen"/>
+                    </CardContent>
+                    <CardActions>
+                        <Button color="primary" onClick={this.handleRandomize}>
+                            Randomize
+                        </Button>
+                        <Button color="accent" onClick={this.handleReset}>
+                            Clear
+                        </Button>
+                        <Button onClick={this.handleInverse}>
+                            Inverse
+                        </Button>
+                    </CardActions>
+                </Card>
 
-                    {
-                        !hide && <div>
-                            <Divider className={classes.divider}/>
-                            <Typography type="subheading">Unselected</Typography>
-                            <CharacterList
-                                characters={unselected}
-                                onClick={this.handleCharacterChange(false)}
-                                type='unselected'
-                            />
-                        </div>
-                    }
+                {/* Available Characters */}
+                <Card className={classes.card}>
+                    <CardHeader title="Available Characters"/>
+                    <CardContent>
+                        <CharacterList
+                            characters={available}
+                            onCharacterClick={this.handleCharacterChange(true)}
+                            type="available"
+                        />
+                    </CardContent>
+                </Card>
 
-                    <Divider className={classes.divider}/>
-                    <Typography type="subheading">Chosen</Typography>
-                    <CharacterList
-                        characters={[chosen]}
-                        type='chosen'
-                    />
-                </CardContent>
+                {/* Unavailable Characters */}
+                {unavailable.length > 0 && <Card className={classes.card}>
+                    <CardHeader title="Unavailable Characters"/>
+                    <CardContent>
+                        <CharacterList
+                            characters={unavailable}
+                            onCharacterClick={this.handleCharacterChange(false)}
+                            type="unavailable"
+                        />
+                    </CardContent>
+                </Card>}
+            </div>
 
-                <CardActions>
-                    <Tooltip title="Choose New Character">
-                        <IconButton color="primary" onClick={this.handleRandomize}>
-                            <ReplayIcon/>
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Reset Selection">
-                        <IconButton color="accent" onClick={this.handleReset}>
-                            <ClearIcon/>
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Invert Selection">
-                        <IconButton onClick={this.handleInverse}>
-                            <SelectAllIcon/>
-                        </IconButton>
-                    </Tooltip>
-                    {
-                        !hide &&
-                        <Tooltip title="Hide Unselected Characters">
-                            <IconButton onClick={this.handleVisibilityChange(true)}>
-                                <VisibilityOffIcon/>
-                            </IconButton>
-                        </Tooltip>
-                    }
-                    {
-                        hide &&
-                        <Tooltip title="Show Unselected Characters">
-                            <IconButton onClick={this.handleVisibilityChange(false)}>
-                                <VisibilityIcon/>
-                            </IconButton>
-                        </Tooltip>
-                    }
-                </CardActions>
-            </Card>
         )
     }
 }
@@ -175,13 +141,20 @@ class Randomizer extends React.Component {
 const localStorageKey = 'characters'
 
 const styles = theme => ({
+    container: {
+        minWidth: 400,
+        maxWidth: 716
+    },
     card: {
         margin: 16,
-        minWidth: 345
+        minWidth: 364
     },
-    divider: {
-        marginTop: 8,
-        marginBottom: 8
+    chosenCard: {
+        margin: 16,
+        width: 368
+    },
+    chosenContainer: {
+        margin: 'auto'
     }
 })
 

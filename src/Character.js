@@ -2,11 +2,13 @@ import React from 'react'
 
 class Character extends React.Component {
     handleClick = (...args) => {
-        this.props.onClick(...args, this.props.data)
+        if (this.props.type !== 'chosen') {
+            this.props.onCharacterClick(...args, this.props.data)
+        }
     }
 
     render() {
-        const {data, type} = this.props
+        const {data = {}, type} = this.props
 
         const style = {
             ...styles.character,
@@ -27,15 +29,17 @@ class Character extends React.Component {
 
 const styles = {
     character: {
-        margin: 2,
+        margin: 4,
         width: 100,
         height: 100,
-        color: 'white',
-        cursor: 'pointer',
-        userSelect: 'none'
+        cursor: 'pointer'
     },
-    unselected: {
+    unavailable: {
         filter: 'grayscale(100%)'
+    },
+    chosen: {
+        cursor: 'default',
+        margin: 'auto'
     }
 }
 
